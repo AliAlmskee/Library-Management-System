@@ -1,5 +1,7 @@
 package library.handler;
 
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,14 @@ public class GlobalExceptionHandler {
 
         return errorMap;
     }
+    @ExceptionHandler(MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleMalformedJwtException(MalformedJwtException exception) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", "Invalid JWT token: " + exception.getMessage());
+
+        return errorMap;
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -44,6 +54,14 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleJwtException(JwtException exception) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", "JWT expired or invalid: " + exception.getMessage());
+
+        return errorMap;
+    }
 
 
 

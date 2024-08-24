@@ -52,7 +52,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
     jwt = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(jwt);
+    try {
+      userEmail = jwtService.extractUsername(jwt);
+    }
+    catch (ExpiredJwtException e) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+      Map<String, String> errorMap = new HashMap<>();
+      errorMap.put("error", "token_expired");
+      errorMap.put("message", "Token has expired. Please authenticate again.");
+      ObjectMapper mapper = new ObjectMapper();
+      response.getWriter().write(mapper.writeValueAsString(errorMap));
+      return;
+    }
+
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       try {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
