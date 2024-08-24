@@ -1,5 +1,7 @@
 package library.book;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import library.book.data.Book;
 import library.book.data.BookDTO;
@@ -17,8 +19,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookController {
 
+
     private final BookService service;
 
+
+    @Operation(
+            description = "save endpoint for book",
+            summary = "to save or update or delete . you must be admin ( it is in the seeder)",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookDTO> save(
