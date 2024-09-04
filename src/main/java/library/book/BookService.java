@@ -1,5 +1,6 @@
 package library.book;
 
+import library.aspect.Loggable;
 import library.book.data.Book;
 import library.book.data.BookDTO;
 import library.book.data.BookRequest;
@@ -20,14 +21,20 @@ public class BookService {
     private final BookRepository repository;
     private final BookMapper bookMapper;
 
+
+    @Loggable
     public ResponseEntity<BookDTO> save(BookRequest request) {
         Book book = repository.save(bookMapper.bookRequestToBook(request));
         return ResponseEntity.ok(bookMapper.toDTO(book));
     }
+
+    @Loggable
     @Cacheable(value = "books", key = "#root.targetClass + #root.methodName")
     public List<BookDTO> findAll() {
         return bookMapper.booksToBookDTOs(repository.findAll());
     }
+
+    @Loggable
     @Cacheable(value = "books", key = "#id")
     public BookDTO findById(Integer id) {
         Book book = repository.findById(id).orElseThrow(() -> new RuntimeException("Book not found with id " + id));
